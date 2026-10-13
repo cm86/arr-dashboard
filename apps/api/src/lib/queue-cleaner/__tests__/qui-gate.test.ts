@@ -84,6 +84,9 @@ describe("resolveQuiAwareGateReasons", () => {
 		enabledQui = true,
 	): PrismaClient {
 		return {
+			systemSettings: {
+				findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }),
+			},
 			serviceInstance: {
 				findFirst: vi.fn().mockResolvedValue(enabledQui ? { id: "qui-1" } : null),
 			},
@@ -92,6 +95,22 @@ describe("resolveQuiAwareGateReasons", () => {
 			},
 		} as unknown as PrismaClient;
 	}
+
+	it("fails closed for correlated queue items when qUI is globally disabled", async () => {
+		const prisma = mockPrisma([]);
+		vi.mocked(prisma.systemSettings.findUnique).mockResolvedValueOnce({
+			quiEnabled: false,
+		} as never);
+		const result = await resolveQuiAwareGateReasons(
+			prisma,
+			"user-1",
+			new Map([["item-1", "a".repeat(40)]]),
+			NOW,
+		);
+		expect(result.get("item-1")).toBe("evidence_unavailable");
+		expect(prisma.serviceInstance.findFirst).not.toHaveBeenCalled();
+		expect(prisma.libraryCache.findMany).not.toHaveBeenCalled();
+	});
 
 	it("returns empty set when no items have hashes (no qui correlation possible)", async () => {
 		const prisma = mockPrisma([]);
@@ -138,6 +157,7 @@ describe("resolveQuiAwareGateReasons", () => {
 	it("filters cache rows by userId through the instance relation", async () => {
 		const findMany = vi.fn().mockResolvedValue([]);
 		const prisma = {
+			systemSettings: { findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }) },
 			serviceInstance: { findFirst: vi.fn().mockResolvedValue({ id: "qui-1" }) },
 			libraryCache: { findMany },
 		} as unknown as PrismaClient;
@@ -237,6 +257,7 @@ describe("resolveQuiAwareGateReasons", () => {
 			.fn()
 			.mockResolvedValue([{ infoHash: "aaaa", torrentState: "paused", torrentSyncedAt: FRESH }]);
 		const prisma = {
+			systemSettings: { findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }) },
 			serviceInstance: { findFirst: vi.fn().mockResolvedValue({ id: "qui-1" }) },
 			libraryCache: { findMany },
 		} as unknown as PrismaClient;

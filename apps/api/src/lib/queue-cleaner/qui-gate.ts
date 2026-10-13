@@ -17,6 +17,7 @@
  */
 
 import type { PrismaClient } from "../prisma.js";
+import { isQuiIntegrationEnabled } from "../qui/integration-enabled.js";
 
 /** qui torrent states that mean "qui or human-via-qui is already acting". */
 const GATED_STATES = new Set(["paused", "error"]);
@@ -79,6 +80,14 @@ export async function resolveQuiAwareGateReasons(
 ): Promise<Map<string, QuiAwareGateReason>> {
 	if (hashesByItemId.size === 0) {
 		return new Map();
+	}
+	// A previously enabled qUI-aware safety rule must not silently stop
+	// protecting torrents when the global integration is switched off.
+	// Without fresh qUI evidence, defer correlated queue mutations.
+	if (!(await isQuiIntegrationEnabled(prisma))) {
+		return new Map(
+			Array.from(hashesByItemId.keys(), (id) => [id, "evidence_unavailable" as const]),
+		);
 	}
 
 	const enabledQui = await prisma.serviceInstance.findFirst({

@@ -43,6 +43,10 @@ vi.mock("../../../../hooks/api/useQui", async () => {
 });
 
 // Mock useIncognitoMode so the drawer renders without an IncognitoProvider.
+vi.mock("../../../../contexts/QuiIntegrationContext", () => ({
+	useQuiIntegrationEnabled: () => true,
+}));
+
 vi.mock("../../../../contexts/IncognitoContext", () => ({
 	useIncognitoMode: () => [false, vi.fn()],
 	IncognitoProvider: ({ children }: { children: ReactNode }) => <>{children}</>,

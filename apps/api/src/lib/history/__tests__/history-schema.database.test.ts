@@ -547,10 +547,10 @@ describe("durable History schema", () => {
 		} finally {
 			legacy.close();
 		}
+		const beforeUpgrade = new Database(databasePath, { readonly: true });
+		const legacyBeforeUpgrade = captureLegacyCompatibilityState(beforeUpgrade);
+		beforeUpgrade.close();
 		syncSchema(historyOnlyUpgradeSchemaPath, databasePath);
-		const beforeReverse = new Database(databasePath, { readonly: true });
-		const legacyBeforeReverse = captureLegacyCompatibilityState(beforeReverse);
-		beforeReverse.close();
 		const outcome = trySyncSchema(oldSchemaPath, databasePath);
 		const reopened = new Database(databasePath, { readonly: true });
 		try {
@@ -566,7 +566,7 @@ describe("durable History schema", () => {
 				)
 				.all() as Array<{ name: string }>;
 			expect(historyTables).toEqual([]);
-			expect(captureLegacyCompatibilityState(reopened)).toEqual(legacyBeforeReverse);
+			expect(captureLegacyCompatibilityState(reopened)).toEqual(legacyBeforeUpgrade);
 		} finally {
 			reopened.close();
 		}

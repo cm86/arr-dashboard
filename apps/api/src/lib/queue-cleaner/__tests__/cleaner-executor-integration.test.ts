@@ -142,6 +142,9 @@ function makeApp(queueBehavior: {
 			}),
 		},
 		prisma: {
+			systemSettings: {
+				findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }),
+			},
 			$transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => fn({})),
 			queueCleanerStrike: {
 				findMany: vi.fn().mockResolvedValue([]),

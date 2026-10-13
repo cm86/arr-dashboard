@@ -25,6 +25,12 @@ vi.mock("../../qui/client-factory.js", () => ({
 
 import { collectQuiSignals } from "../collectors.js";
 
+const enabledQuiApp = {
+	prisma: {
+		systemSettings: { findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }) },
+	},
+} as never;
+
 const silentLog: FastifyBaseLogger = {
 	info: vi.fn(),
 	warn: vi.fn(),
@@ -44,7 +50,7 @@ beforeEach(() => {
 describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 	it("emits NOTHING when no qui instances are configured", async () => {
 		mockListQuiInstances.mockResolvedValue([]);
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toEqual([]);
 	});
 
@@ -58,7 +64,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 				{ id: 2, name: "qbit-b", connected: true },
 			]),
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toEqual([]);
 	});
 
@@ -75,7 +81,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 				{ id: 3, name: "qbit-c", connected: false },
 			]),
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(1);
 		expect(items[0]).toMatchObject({ severity: "warning", source: "qui" });
 		expect(items[0]?.title).toMatch(/2 of 3 qBittorrent instances disconnected/);
@@ -93,7 +99,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 		mockCreateQuiClient.mockReturnValue({
 			listInstances: vi.fn().mockResolvedValue([{ id: 1, name: "qbit-only", connected: false }]),
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(1);
 		expect(items[0]?.detail).toMatch(/All qBittorrent instances behind this qui are offline/);
 	});
@@ -111,7 +117,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 				.fn()
 				.mockRejectedValue(new QuiInstanceUnreachableError("qui-1", { reason: "ECONNREFUSED" })),
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(1);
 		expect(items[0]).toMatchObject({ severity: "critical", source: "qui" });
 		expect(items[0]?.title).toMatch(/main qui is unreachable/);
@@ -133,7 +139,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 			// inside createQuiClient before any qui HTTP call happens.
 			throw new Error("Failed to decrypt API key");
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(1);
 		expect(items[0]).toMatchObject({ severity: "critical", source: "qui" });
 		expect(items[0]?.id).toMatch(/^qui-config-error-/);
@@ -155,7 +161,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 				.fn()
 				.mockRejectedValue(new QuiInstanceUnreachableError("qui-1", { reason: "timeout" })),
 		});
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(1);
 		expect(items[0]?.id).toMatch(/^qui-offline-/);
 		expect(items[0]?.title).toMatch(/main qui is unreachable/);
@@ -174,7 +180,7 @@ describe("collectQuiSignals — rollup attention items (Phase 2.1b)", () => {
 					? vi.fn().mockRejectedValue(new Error("nope"))
 					: vi.fn().mockResolvedValue([{ id: 1, name: "qb", connected: false }]),
 		}));
-		const items = await collectQuiSignals({} as never, "u", silentLog);
+		const items = await collectQuiSignals(enabledQuiApp, "u", silentLog);
 		expect(items).toHaveLength(2);
 		const severities = items.map((i) => i.severity).sort();
 		expect(severities).toEqual(["critical", "warning"]);

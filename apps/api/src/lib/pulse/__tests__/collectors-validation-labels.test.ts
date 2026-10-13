@@ -58,6 +58,7 @@ function makeHealth(state: "failing" | "degraded") {
 function makeApp(): FastifyInstance {
 	return {
 		prisma: {
+			systemSettings: { findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }) },
 			// All the other collectors short-circuit on empty queries.
 			serviceInstance: { findMany: vi.fn().mockResolvedValue([]) },
 			cacheRefreshStatus: { findMany: vi.fn().mockResolvedValue([]) },
