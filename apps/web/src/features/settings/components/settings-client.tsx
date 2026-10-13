@@ -9,6 +9,7 @@ import {
 	PremiumTabs,
 } from "../../../components/layout";
 import { useCurrentUser } from "../../../hooks/api/useAuth";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { useServicesQuery } from "../../../hooks/api/useServicesQuery";
 import { useTagsQuery } from "../../../hooks/api/useTags";
 import { useThemeGradient } from "../../../hooks/useThemeGradient";
@@ -48,6 +49,12 @@ export const SettingsClient = () => {
 	const { data: services = [], isLoading: servicesLoading } = useServicesQuery();
 	const { data: tags = [] } = useTagsQuery();
 	const { data: currentUser } = useCurrentUser();
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
+	const visibleServices = useMemo(
+		() =>
+			quiIntegrationEnabled ? services : services.filter((service) => service.service !== "qui"),
+		[quiIntegrationEnabled, services],
+	);
 
 	// Local state
 	const [activeTab, setActiveTab] = useState<TabType>("services");
@@ -142,12 +149,12 @@ export const SettingsClient = () => {
 				{activeTab === "services" && (
 					<div role="tabpanel" id="settings-panel-services" aria-labelledby="settings-tab-services">
 						<GettingStartedBanner
-							services={services}
+							services={visibleServices}
 							onSelectService={(service) => serviceFormState.resetForm(service)}
 						/>
 						<div className="grid gap-4 sm:gap-6 xl:grid-cols-[2fr_1fr]">
 							<ServicesTab
-								services={services}
+								services={visibleServices}
 								isLoading={servicesLoading}
 								onTestConnection={servicesManagement.handleTestConnection}
 								onEdit={serviceFormState.handleEdit}
@@ -175,7 +182,7 @@ export const SettingsClient = () => {
 									)
 								}
 								selectedService={serviceFormState.selectedServiceForEdit}
-								services={services}
+								services={visibleServices}
 								availableTags={availableTags}
 								isCreating={servicesManagement.createServiceMutation.isPending}
 								isUpdating={servicesManagement.updateServiceMutation.isPending}
@@ -191,6 +198,7 @@ export const SettingsClient = () => {
 										);
 									}
 								}}
+								quiEnabled={quiIntegrationEnabled}
 							/>
 						</div>
 					</div>

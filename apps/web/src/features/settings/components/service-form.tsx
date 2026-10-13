@@ -66,6 +66,7 @@ interface ServiceFormProps {
 	onConfirmIdentity: () => void;
 	onDismissIdentityFlow: () => void;
 	onInspectIdentity: () => void;
+	quiEnabled?: boolean;
 }
 
 /**
@@ -88,6 +89,7 @@ export const ServiceForm = ({
 	onConfirmIdentity,
 	onDismissIdentityFlow,
 	onInspectIdentity,
+	quiEnabled = true,
 }: ServiceFormProps) => {
 	const { gradient: themeGradient } = useThemeGradient();
 	const placeholders = getServicePlaceholders(formState.service);
@@ -170,7 +172,7 @@ export const ServiceForm = ({
 					<div className="space-y-2">
 						<label className="text-xs uppercase text-muted-foreground">Service</label>
 						<div className="grid grid-cols-4 gap-1.5 sm:gap-2 lg:grid-cols-8 xl:grid-cols-4">
-							{SERVICE_TYPES.map((service) => (
+							{SERVICE_TYPES.filter((service) => quiEnabled || service !== "qui").map((service) => (
 								<button
 									key={service}
 									type="button"

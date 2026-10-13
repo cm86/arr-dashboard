@@ -490,10 +490,11 @@ export const useSeriesTorrents = (args: {
  * an empty record so the brand pills fall back to text abbreviations
  * — never breaks the panel.
  */
-export const useTrackerIcons = () => {
+export const useTrackerIcons = (options: { enabled?: boolean } = {}) => {
 	return useQuery({
 		queryKey: quiKeys.trackerIcons(),
 		queryFn: fetchTrackerIcons,
+		enabled: options.enabled,
 		// 1 hour: matches the backend cache window. Icons are user-curated
 		// per-tracker — they change when the user adds a new tracker or
 		// uploads a custom icon, not on a per-minute basis.

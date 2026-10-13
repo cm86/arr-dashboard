@@ -45,6 +45,7 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { prewarmAllSequential, prewarmInstance } from "../lib/qui/cache-prewarm.js";
 import { createQuiClient } from "../lib/qui/client-factory.js";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { getCachedAllTorrents } from "../lib/qui/torrent-list-cache.js";
 
 const STARTUP_DELAY_MS = 30_000;
@@ -57,6 +58,7 @@ const quiCachePrewarmPlugin = fp(
 
 		async function runPrewarm(): Promise<void> {
 			if (cancelled) return;
+			if (!(await isQuiIntegrationEnabled(app.prisma))) return;
 			const instances = await app.prisma.serviceInstance.findMany({
 				where: { service: "QUI", enabled: true },
 			});

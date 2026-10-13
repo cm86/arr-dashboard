@@ -68,12 +68,12 @@ vi.mock("../../lib/library-sync/episode-file-backfill.js", () => ({
 import Fastify, { type FastifyRequest } from "fastify";
 import { InstanceNotFoundError } from "../../lib/errors.js";
 import { hashSecret } from "../../lib/qui/webhook-secret.js";
-import { registerQuiRoutes } from "../qui.js";
 import {
 	buildQuiDeploymentId,
 	buildQuiNotificationTargetName,
 	buildQuiNotificationTargetOwnerId,
 } from "../qui/webhook-routes.js";
+import { registerQuiRoutes } from "../qui.js";
 import {
 	createInjectAuthenticated,
 	createMockEncryptor,
@@ -217,6 +217,15 @@ async function injectWebhookConfigWithTrustProxy(options: {
 }
 
 describe("GET /qui/instances", () => {
+	it("returns not found when the Qui integration is disabled", async () => {
+		mockPrisma.systemSettings.findUnique.mockResolvedValue({ quiEnabled: false });
+
+		const res = await injectAuthenticated("GET", "/qui/instances");
+
+		expect(res.statusCode).toBe(404);
+		expect(mockListQuiInstances).not.toHaveBeenCalled();
+	});
+
 	it("returns empty array when no QUI instances exist", async () => {
 		const res = await injectAuthenticated("GET", "/qui/instances");
 		expect(res.statusCode).toBe(200);

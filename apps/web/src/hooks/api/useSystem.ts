@@ -27,10 +27,11 @@ import { systemKeys, validationKeys } from "../../lib/query-keys";
 // System Settings
 // ============================================================================
 
-export function useSystemSettings() {
+export function useSystemSettings(options: { enabled?: boolean } = {}) {
 	return useQuery<SystemSettingsResponse>({
 		queryKey: systemKeys.settings,
 		queryFn: fetchSystemSettings,
+		enabled: options.enabled,
 	});
 }
 

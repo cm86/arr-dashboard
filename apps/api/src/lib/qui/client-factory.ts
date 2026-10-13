@@ -26,6 +26,7 @@ import {
 	quiHealthProbe,
 	quiRequest,
 } from "./client-helpers.js";
+import { isQuiIntegrationEnabled } from "./integration-enabled.js";
 import { mapTrackerHealth } from "./tracker-health-mapper.js";
 
 export interface QuiTorrentInventory {
@@ -461,6 +462,7 @@ export function createQuiClient(app: FastifyInstance, instance: ServiceInstance)
 		apiKey,
 		httpAuthHeaders: getStoredHttpAuthHeaders(app.encryptor, instance),
 		log: app.log,
+		isIntegrationEnabled: () => isQuiIntegrationEnabled(app.prisma),
 	};
 
 	async function fetchTorrentInventory(requireComplete: boolean): Promise<QuiTorrentInventory> {

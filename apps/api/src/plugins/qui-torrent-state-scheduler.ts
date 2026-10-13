@@ -13,6 +13,7 @@
 
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { runQuiTorrentStateSync } from "../lib/qui/torrent-state-sync.js";
 import { JOB_ID } from "../lib/scheduler-registry/job-definitions.js";
 
@@ -26,6 +27,7 @@ const quiTorrentStateSchedulerPlugin = fp(
 		let isRunning = false;
 
 		async function tick() {
+			if (!(await isQuiIntegrationEnabled(app.prisma))) return;
 			if (isRunning) {
 				app.log.warn("qui torrent-state sync already running, skipping tick");
 				return;

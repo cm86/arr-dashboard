@@ -396,6 +396,7 @@ model BackupSettings {
 // These settings affect the entire application and may require restart to take effect
 model SystemSettings {
   id Int @id @default(1)
+  quiEnabled Boolean @default(true)
 
   // Port configuration
   // These override the default ports (API: 3001, Web: 3000)

@@ -20,6 +20,11 @@ const buildApp = (): FastifyInstance =>
 	({
 		log: fakeLog,
 		encryptor: { decrypt: () => "test-api-key" },
+		prisma: {
+			systemSettings: {
+				findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }),
+			},
+		},
 	}) as unknown as FastifyInstance;
 
 const buildInstance = (over: Partial<ServiceInstance> = {}): ServiceInstance =>
@@ -127,6 +132,11 @@ describe("createQuiClient", () => {
 		);
 		const app = {
 			log: fakeLog,
+			prisma: {
+				systemSettings: {
+					findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }),
+				},
+			},
 			encryptor: {
 				decrypt: ({ value }: { value: string }) =>
 					value === "http-enc"

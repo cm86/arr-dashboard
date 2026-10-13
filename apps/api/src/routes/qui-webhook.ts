@@ -22,6 +22,7 @@ import type { FastifyPluginCallback } from "fastify";
 import { z } from "zod";
 import { logQuiActivity } from "../lib/qui/activity-log.js";
 import { quiEventBus } from "../lib/qui/event-bus.js";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { resolveUserFromQuiSecret } from "../lib/qui/webhook-secret.js";
 import { getErrorMessage } from "../lib/utils/error-message.js";
 import { buildQuiDeploymentId, buildQuiNotificationTargetOwnerId } from "./qui/webhook-routes.js";
@@ -69,6 +70,12 @@ function isForeignKeyConstraintError(error: unknown): boolean {
 }
 
 const quiWebhookRoute: FastifyPluginCallback = (app, _opts, done) => {
+	app.addHook("onRequest", async (_request, reply) => {
+		if (!(await isQuiIntegrationEnabled(app.prisma))) {
+			return reply.status(404).send({ error: "Qui integration is disabled" });
+		}
+	});
+
 	app.post<{
 		Querystring: {
 			secret?: string;

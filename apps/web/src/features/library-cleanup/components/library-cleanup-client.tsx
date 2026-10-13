@@ -88,6 +88,7 @@ import {
 	useUpdateCleanupRule,
 } from "../../../hooks/api/useLibraryCleanup";
 import { useServicesQuery } from "../../../hooks/api/useServicesQuery";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { CleanupRuleDialog } from "./cleanup-rule-dialog";
 import { CleanupRuleTemplates } from "./cleanup-rule-templates";
 import { QuiStatusBadge } from "./qui-status-badge";
@@ -319,6 +320,7 @@ function ConfigTab({
 	executeError?: Error | null;
 	onExplain: (target: ExplainTarget) => void;
 }) {
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	const [incognitoMode] = useIncognitoMode();
 	const createRule = useCreateCleanupRule();
 	const updateRule = useUpdateCleanupRule();
@@ -497,12 +499,14 @@ function ConfigTab({
 							checked={config.requireApproval}
 							onChange={(v) => onUpdateConfig({ requireApproval: v })}
 						/>
-						<ToggleRow
-							label="Respect qui Seeding"
-							description="Skip items currently seeding via qui (honors private-tracker ratio obligations). No-op without a qui instance configured."
-							checked={config.respectQuiSeeding ?? false}
-							onChange={(v) => onUpdateConfig({ respectQuiSeeding: v })}
-						/>
+						{quiIntegrationEnabled && (
+							<ToggleRow
+								label="Respect qui Seeding"
+								description="Skip items currently seeding via qui (honors private-tracker ratio obligations). No-op without a qui instance configured."
+								checked={config.respectQuiSeeding ?? false}
+								onChange={(v) => onUpdateConfig({ respectQuiSeeding: v })}
+							/>
+						)}
 					</div>
 					<div className="grid gap-4 sm:grid-cols-2 mt-4">
 						<label className="block">
@@ -856,10 +860,12 @@ function ConfigTab({
 													<span className="truncate">
 														{incognitoMode ? getLinuxIsoName(item.title) : item.title}
 													</span>
-													<QuiStatusBadge
-														status={item.quiStatus}
-														observedAt={item.quiStatusObservedAt}
-													/>
+													{quiIntegrationEnabled && (
+														<QuiStatusBadge
+															status={item.quiStatus}
+															observedAt={item.quiStatusObservedAt}
+														/>
+													)}
 												</div>
 												<EpisodeIdentity item={episodeItem} incognitoMode={incognitoMode} />
 												{(item.action === "skipped" ||

@@ -39,6 +39,7 @@ import {
 	runInfoHashBackfillSweep,
 } from "../lib/library-sync/infohash-backfill.js";
 import { runPathBackfillSweep } from "../lib/library-sync/infohash-backfill-by-path.js";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { JOB_ID } from "../lib/scheduler-registry/job-definitions.js";
 
 const INTERVAL_MS = 6 * 60 * 60_000; // 6h steady-state cadence
@@ -56,6 +57,7 @@ const infoHashBackfillSchedulerPlugin = fp(
 		let isRunning = false;
 
 		async function runOneSweep(): Promise<BackfillSweepResult | null> {
+			if (!(await isQuiIntegrationEnabled(app.prisma))) return null;
 			if (isRunning) {
 				app.log.warn("infoHash backfill already running, skipping tick");
 				return null;

@@ -349,6 +349,7 @@ export type BackupSettingsScalarFieldEnum = (typeof BackupSettingsScalarFieldEnu
 
 export const SystemSettingsScalarFieldEnum = {
   id: 'id',
+  quiEnabled: 'quiEnabled',
   apiPort: 'apiPort',
   webPort: 'webPort',
   listenAddress: 'listenAddress',

@@ -38,7 +38,7 @@ for the full rationale.
 | Path | Maturity | Summary |
 |---|---|---|
 | `/api/oidc-providers` | operator | OIDC provider configuration (single-admin) |
-| `/api/system` | operator | Settings, restart, jobs, posture diagnostics |
+| `/api/system` | operator | Settings (including the runtime Qui integration switch), restart, jobs, posture diagnostics |
 | `/api/backup` | operator | Create, download, restore, scheduled backups |
 | `/api/notifications` | stable | Channels, subscriptions, rules, delivery aggregation |
 | `/api/services` | stable | ARR instance CRUD + connection testing |
@@ -67,6 +67,12 @@ pages and a shared 10-second deadline. It requires a short terminal page;
 duplicates, invalid rows, page failures or the 100-page cap reject that source
 rather than publishing truncated totals. The single-user
 `get_user_watch_time_stats` endpoint is not an all-users statistics source.
+
+The system setting `quiEnabled` defaults to `true`. Disabling it immediately
+hides the Qui pages and related UI, stops scheduled Qui work, rejects Qui API
+and webhook requests, and prevents outbound requests to Qui. Existing service
+configuration and stored observations are retained for when the switch is
+enabled again.
 
 > When you add a new route group, add a manifest entry **and** a row above.
 > A contract test (`apps/api/src/routes/__tests__/route-manifest.test.ts`)

@@ -42,6 +42,7 @@ export type SystemSettingsSumAggregateOutputType = {
 
 export type SystemSettingsMinAggregateOutputType = {
   id: number | null
+  quiEnabled: boolean | null
   apiPort: number | null
   webPort: number | null
   listenAddress: string | null
@@ -56,6 +57,7 @@ export type SystemSettingsMinAggregateOutputType = {
 
 export type SystemSettingsMaxAggregateOutputType = {
   id: number | null
+  quiEnabled: boolean | null
   apiPort: number | null
   webPort: number | null
   listenAddress: string | null
@@ -70,6 +72,7 @@ export type SystemSettingsMaxAggregateOutputType = {
 
 export type SystemSettingsCountAggregateOutputType = {
   id: number
+  quiEnabled: number
   apiPort: number
   webPort: number
   listenAddress: number
@@ -100,6 +103,7 @@ export type SystemSettingsSumAggregateInputType = {
 
 export type SystemSettingsMinAggregateInputType = {
   id?: true
+  quiEnabled?: true
   apiPort?: true
   webPort?: true
   listenAddress?: true
@@ -114,6 +118,7 @@ export type SystemSettingsMinAggregateInputType = {
 
 export type SystemSettingsMaxAggregateInputType = {
   id?: true
+  quiEnabled?: true
   apiPort?: true
   webPort?: true
   listenAddress?: true
@@ -128,6 +133,7 @@ export type SystemSettingsMaxAggregateInputType = {
 
 export type SystemSettingsCountAggregateInputType = {
   id?: true
+  quiEnabled?: true
   apiPort?: true
   webPort?: true
   listenAddress?: true
@@ -229,6 +235,7 @@ export type SystemSettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 
 export type SystemSettingsGroupByOutputType = {
   id: number
+  quiEnabled: boolean
   apiPort: number
   webPort: number
   listenAddress: string
@@ -266,6 +273,7 @@ export type SystemSettingsWhereInput = {
   OR?: Prisma.SystemSettingsWhereInput[]
   NOT?: Prisma.SystemSettingsWhereInput | Prisma.SystemSettingsWhereInput[]
   id?: Prisma.IntFilter<"SystemSettings"> | number
+  quiEnabled?: Prisma.BoolFilter<"SystemSettings"> | boolean
   apiPort?: Prisma.IntFilter<"SystemSettings"> | number
   webPort?: Prisma.IntFilter<"SystemSettings"> | number
   listenAddress?: Prisma.StringFilter<"SystemSettings"> | string
@@ -280,6 +288,7 @@ export type SystemSettingsWhereInput = {
 
 export type SystemSettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  quiEnabled?: Prisma.SortOrder
   apiPort?: Prisma.SortOrder
   webPort?: Prisma.SortOrder
   listenAddress?: Prisma.SortOrder
@@ -297,6 +306,7 @@ export type SystemSettingsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.SystemSettingsWhereInput | Prisma.SystemSettingsWhereInput[]
   OR?: Prisma.SystemSettingsWhereInput[]
   NOT?: Prisma.SystemSettingsWhereInput | Prisma.SystemSettingsWhereInput[]
+  quiEnabled?: Prisma.BoolFilter<"SystemSettings"> | boolean
   apiPort?: Prisma.IntFilter<"SystemSettings"> | number
   webPort?: Prisma.IntFilter<"SystemSettings"> | number
   listenAddress?: Prisma.StringFilter<"SystemSettings"> | string
@@ -311,6 +321,7 @@ export type SystemSettingsWhereUniqueInput = Prisma.AtLeast<{
 
 export type SystemSettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  quiEnabled?: Prisma.SortOrder
   apiPort?: Prisma.SortOrder
   webPort?: Prisma.SortOrder
   listenAddress?: Prisma.SortOrder
@@ -333,6 +344,7 @@ export type SystemSettingsScalarWhereWithAggregatesInput = {
   OR?: Prisma.SystemSettingsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SystemSettingsScalarWhereWithAggregatesInput | Prisma.SystemSettingsScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"SystemSettings"> | number
+  quiEnabled?: Prisma.BoolWithAggregatesFilter<"SystemSettings"> | boolean
   apiPort?: Prisma.IntWithAggregatesFilter<"SystemSettings"> | number
   webPort?: Prisma.IntWithAggregatesFilter<"SystemSettings"> | number
   listenAddress?: Prisma.StringWithAggregatesFilter<"SystemSettings"> | string
@@ -347,6 +359,7 @@ export type SystemSettingsScalarWhereWithAggregatesInput = {
 
 export type SystemSettingsCreateInput = {
   id?: number
+  quiEnabled?: boolean
   apiPort?: number
   webPort?: number
   listenAddress?: string
@@ -361,6 +374,7 @@ export type SystemSettingsCreateInput = {
 
 export type SystemSettingsUncheckedCreateInput = {
   id?: number
+  quiEnabled?: boolean
   apiPort?: number
   webPort?: number
   listenAddress?: string
@@ -375,6 +389,7 @@ export type SystemSettingsUncheckedCreateInput = {
 
 export type SystemSettingsUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   apiPort?: Prisma.IntFieldUpdateOperationsInput | number
   webPort?: Prisma.IntFieldUpdateOperationsInput | number
   listenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -389,6 +404,7 @@ export type SystemSettingsUpdateInput = {
 
 export type SystemSettingsUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   apiPort?: Prisma.IntFieldUpdateOperationsInput | number
   webPort?: Prisma.IntFieldUpdateOperationsInput | number
   listenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -403,6 +419,7 @@ export type SystemSettingsUncheckedUpdateInput = {
 
 export type SystemSettingsCreateManyInput = {
   id?: number
+  quiEnabled?: boolean
   apiPort?: number
   webPort?: number
   listenAddress?: string
@@ -417,6 +434,7 @@ export type SystemSettingsCreateManyInput = {
 
 export type SystemSettingsUpdateManyMutationInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   apiPort?: Prisma.IntFieldUpdateOperationsInput | number
   webPort?: Prisma.IntFieldUpdateOperationsInput | number
   listenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -431,6 +449,7 @@ export type SystemSettingsUpdateManyMutationInput = {
 
 export type SystemSettingsUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   apiPort?: Prisma.IntFieldUpdateOperationsInput | number
   webPort?: Prisma.IntFieldUpdateOperationsInput | number
   listenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -445,6 +464,7 @@ export type SystemSettingsUncheckedUpdateManyInput = {
 
 export type SystemSettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  quiEnabled?: Prisma.SortOrder
   apiPort?: Prisma.SortOrder
   webPort?: Prisma.SortOrder
   listenAddress?: Prisma.SortOrder
@@ -466,6 +486,7 @@ export type SystemSettingsAvgOrderByAggregateInput = {
 
 export type SystemSettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  quiEnabled?: Prisma.SortOrder
   apiPort?: Prisma.SortOrder
   webPort?: Prisma.SortOrder
   listenAddress?: Prisma.SortOrder
@@ -480,6 +501,7 @@ export type SystemSettingsMaxOrderByAggregateInput = {
 
 export type SystemSettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  quiEnabled?: Prisma.SortOrder
   apiPort?: Prisma.SortOrder
   webPort?: Prisma.SortOrder
   listenAddress?: Prisma.SortOrder
@@ -507,6 +529,7 @@ export type NullableBoolFieldUpdateOperationsInput = {
 
 export type SystemSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  quiEnabled?: boolean
   apiPort?: boolean
   webPort?: boolean
   listenAddress?: boolean
@@ -521,6 +544,7 @@ export type SystemSettingsSelect<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type SystemSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  quiEnabled?: boolean
   apiPort?: boolean
   webPort?: boolean
   listenAddress?: boolean
@@ -535,6 +559,7 @@ export type SystemSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 
 export type SystemSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  quiEnabled?: boolean
   apiPort?: boolean
   webPort?: boolean
   listenAddress?: boolean
@@ -549,6 +574,7 @@ export type SystemSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 
 export type SystemSettingsSelectScalar = {
   id?: boolean
+  quiEnabled?: boolean
   apiPort?: boolean
   webPort?: boolean
   listenAddress?: boolean
@@ -561,13 +587,14 @@ export type SystemSettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SystemSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "apiPort" | "webPort" | "listenAddress" | "appName" | "trustProxy" | "secureCookies" | "notificationLogRetentionDays" | "externalUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["systemSettings"]>
+export type SystemSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "quiEnabled" | "apiPort" | "webPort" | "listenAddress" | "appName" | "trustProxy" | "secureCookies" | "notificationLogRetentionDays" | "externalUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["systemSettings"]>
 
 export type $SystemSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemSettings"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    quiEnabled: boolean
     apiPort: number
     webPort: number
     listenAddress: string
@@ -1002,6 +1029,7 @@ export interface Prisma__SystemSettingsClient<T, Null = never, ExtArgs extends r
  */
 export interface SystemSettingsFieldRefs {
   readonly id: Prisma.FieldRef<"SystemSettings", 'Int'>
+  readonly quiEnabled: Prisma.FieldRef<"SystemSettings", 'Boolean'>
   readonly apiPort: Prisma.FieldRef<"SystemSettings", 'Int'>
   readonly webPort: Prisma.FieldRef<"SystemSettings", 'Int'>
   readonly listenAddress: Prisma.FieldRef<"SystemSettings", 'String'>

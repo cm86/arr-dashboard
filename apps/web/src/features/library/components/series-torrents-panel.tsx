@@ -14,6 +14,7 @@ import {
 	Sparkles,
 } from "lucide-react";
 import { useState } from "react";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { GlassmorphicCard } from "../../../components/layout/premium-containers";
 import { Button } from "../../../components/ui/button";
 import {
@@ -126,6 +127,7 @@ export const SeriesTorrentsPanel: React.FC<Props> = ({
 	itemType = "series",
 }) => {
 	const [isIncognito] = useIncognitoMode();
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	// Pick the right data source. Both hooks return the same wire shape;
 	// the movie response just has `seasonGroups: []` to signal flat rendering.
 	// We call both unconditionally with `enabled` flags to satisfy React's
@@ -134,19 +136,19 @@ export const SeriesTorrentsPanel: React.FC<Props> = ({
 	const seriesQuery = useSeriesTorrents({
 		arrInstanceId,
 		arrItemId,
-		enabled: itemType === "series",
+		enabled: quiIntegrationEnabled && itemType === "series",
 	});
 	const movieQuery = useMovieTorrents({
 		arrInstanceId,
 		arrItemId,
-		enabled: itemType === "movie",
+		enabled: quiIntegrationEnabled && itemType === "movie",
 	});
 	const dataQuery = itemType === "series" ? seriesQuery : movieQuery;
 	// qui-curated tracker logo registry. Cached for 1h; empty record on
 	// failure. Passed into `resolveCopyTrackerBrand` everywhere the brand
 	// pill is rendered, so when qui has an icon for a hostname we show
 	// the logo instead of the text abbreviation.
-	const iconsQuery = useTrackerIcons();
+	const iconsQuery = useTrackerIcons({ enabled: quiIntegrationEnabled });
 	const trackerIcons = iconsQuery.data?.trackers;
 	const mutation = useTriggerQuiCrossSeedSearch();
 	const [searchOutcome, setSearchOutcome] = useState<
@@ -164,6 +166,8 @@ export const SeriesTorrentsPanel: React.FC<Props> = ({
 	} | null>(null);
 	const [expandedClusters, setExpandedClusters] = useState<Set<string>>(new Set());
 	const [expandedSeasons, setExpandedSeasons] = useState<Set<number>>(new Set());
+
+	if (!quiIntegrationEnabled) return null;
 
 	const handleSearchClick = async () => {
 		setSearchOutcome(null);

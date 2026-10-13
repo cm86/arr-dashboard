@@ -9,6 +9,7 @@ import type {
 } from "@arr/shared";
 import { useSearchParams } from "next/navigation";
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { PlexQueryEvidenceNotice } from "../../../components/presentational/plex-evidence-notice";
 import { ProviderObservationNotice } from "../../../components/presentational/provider-observation-notice";
 import { toast } from "../../../components/ui";
@@ -138,6 +139,7 @@ function mergeWatchEnrichmentMaps(
  * The component delegates most logic to custom hooks and child components.
  */
 export const LibraryClient: React.FC = () => {
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	// Modal state
 	const [itemDetail, setItemDetail] = useState<LibraryItem | null>(null);
 	const [albumDetail, setAlbumDetail] = useState<LibraryItem | null>(null);
@@ -245,8 +247,9 @@ export const LibraryClient: React.FC = () => {
 	// from the cached LibraryCache column) — no per-card polling.
 	const hasQui = useMemo(
 		() =>
+			quiIntegrationEnabled &&
 			Object.values(data.serviceLookup).some((s) => s.service.toLowerCase() === "qui" && s.enabled),
-		[data.serviceLookup],
+		[data.serviceLookup, quiIntegrationEnabled],
 	);
 
 	// Notify user if Seerr enrichment fails (one-time per error transition)

@@ -30,6 +30,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useThemeGradient } from "../../hooks/useThemeGradient";
 import { cn } from "../../lib/utils";
 import { useColorTheme } from "../../providers/color-theme-provider";
+import { useQuiIntegrationEnabled } from "../../contexts/QuiIntegrationContext";
 import { springs } from "../motion";
 
 interface NavItem {
@@ -136,6 +137,7 @@ function findGroupForPath(pathname: string): string | undefined {
 
 interface NavContentProps {
 	useFlatStyling: boolean;
+	quiIntegrationEnabled: boolean;
 	themeGradient: { from: string; to: string; glow: string };
 	pathname: string;
 	collapsedGroups: Set<string>;
@@ -145,6 +147,7 @@ interface NavContentProps {
 
 const NavContent = ({
 	useFlatStyling,
+	quiIntegrationEnabled,
 	themeGradient,
 	pathname,
 	collapsedGroups,
@@ -207,7 +210,18 @@ const NavContent = ({
 				aria-label="Main navigation"
 				className="flex flex-col gap-3 relative z-10 overflow-y-auto flex-1 -mx-2 px-2"
 			>
-				{NAV_GROUPS.map((group) => {
+				{NAV_GROUPS.map((group) => ({
+					...group,
+					items: quiIntegrationEnabled
+						? group.items
+						: group.items.filter(
+								(item) =>
+									item.href !== "/qui" &&
+									item.href !== "/qui-activity" &&
+									item.href !== "/cross-seed",
+							),
+				})).map((group) => {
+					if (group.items.length === 0) return null;
 					const isCollapsed = collapsedGroups.has(group.id);
 					const hasActiveItem = group.items.some((item) => item.href === pathname);
 
@@ -359,6 +373,7 @@ const NavContent = ({
 );
 
 export const Sidebar = () => {
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	const pathname = usePathname();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [mounted, setMounted] = useState(false);
@@ -494,6 +509,7 @@ export const Sidebar = () => {
 
 						<NavContent
 							useFlatStyling={useFlatStyling}
+							quiIntegrationEnabled={quiIntegrationEnabled}
 							themeGradient={themeGradient}
 							pathname={pathname}
 							collapsedGroups={collapsedGroups}
@@ -520,6 +536,7 @@ export const Sidebar = () => {
 
 				<NavContent
 					useFlatStyling={useFlatStyling}
+					quiIntegrationEnabled={quiIntegrationEnabled}
 					themeGradient={themeGradient}
 					pathname={pathname}
 					collapsedGroups={collapsedGroups}

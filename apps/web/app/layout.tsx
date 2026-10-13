@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthGate } from "../src/components/auth/auth-gate";
 import { LayoutWrapper } from "../src/components/layout/layout-wrapper";
 import { Toaster } from "../src/components/ui";
+import { QuiIntegrationProvider } from "../src/contexts/QuiIntegrationContext";
 import { QuiStreamProvider } from "../src/contexts/QuiStreamContext";
 import { COLOR_THEMES } from "../src/lib/theme-constants";
 import { RootProviders } from "../src/providers/root-providers";
@@ -97,11 +98,13 @@ const RootLayout = ({ children }: RootLayoutProps) => {
 						 * QuiStreamProvider opens ONE EventSource per browser tab so
 						 * the whole dashboard benefits from push-driven invalidation
 						 * (not just the qui-activity surface). It self-gates on
-						 * "user is authenticated AND has a qui instance configured."
+						 * "integration enabled, user authenticated, and a qui instance configured."
 						 */}
-						<QuiStreamProvider>
-							<LayoutWrapper>{children}</LayoutWrapper>
-						</QuiStreamProvider>
+						<QuiIntegrationProvider>
+							<QuiStreamProvider>
+								<LayoutWrapper>{children}</LayoutWrapper>
+							</QuiStreamProvider>
+						</QuiIntegrationProvider>
 					</AuthGate>
 					<Toaster />
 				</RootProviders>

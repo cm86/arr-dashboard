@@ -1,4 +1,5 @@
 import type { FastifyPluginCallback } from "fastify";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { registerActionRoutes } from "./qui/action-routes.js";
 import { registerInstanceRoutes } from "./qui/instance-routes.js";
 import { registerLibraryRoutes } from "./qui/library-routes.js";
@@ -20,6 +21,12 @@ import { registerWebhookRoutes } from "./qui/webhook-routes.js";
  * server.ts to map onto HTTP responses.
  */
 const quiRoute: FastifyPluginCallback = (app, _opts, done) => {
+	app.addHook("onRequest", async (_request, reply) => {
+		if (!(await isQuiIntegrationEnabled(app.prisma))) {
+			return reply.status(404).send({ error: "Qui integration is disabled" });
+		}
+	});
+
 	registerInstanceRoutes(app);
 	registerTorrentRoutes(app);
 	registerPanelRoutes(app);

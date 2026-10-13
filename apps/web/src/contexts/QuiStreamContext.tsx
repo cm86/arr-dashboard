@@ -25,6 +25,7 @@ import { createContext, type ReactNode, useContext } from "react";
 import { useCurrentUser } from "../hooks/api/useAuth";
 import { type QuiEventStreamStatus, useQuiEventStream } from "../hooks/api/useQui";
 import { useServicesQuery } from "../hooks/api/useServicesQuery";
+import { useQuiIntegrationEnabled } from "./QuiIntegrationContext";
 
 /**
  * Same public-route set used by `AuthGate`. We mirror it here so the
@@ -62,12 +63,15 @@ export const QuiStreamProvider = ({ children }: { children: ReactNode }) => {
 	//      stream would be a permanently-idle socket.
 	const pathname = usePathname();
 	const isPublicRoute = PUBLIC_ROUTES.has(pathname ?? "");
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 
 	const { data: user } = useCurrentUser(!isPublicRoute);
-	const { data: services } = useServicesQuery({ enabled: !isPublicRoute && Boolean(user) });
+	const { data: services } = useServicesQuery({
+		enabled: !isPublicRoute && Boolean(user) && quiIntegrationEnabled,
+	});
 	const hasQui = Boolean(services?.some((s) => s.service === "qui" && s.enabled));
 
-	const enabled = !isPublicRoute && Boolean(user) && hasQui;
+	const enabled = !isPublicRoute && Boolean(user) && hasQui && quiIntegrationEnabled;
 	const { streamStatus } = useQuiEventStream({ enabled });
 
 	return (

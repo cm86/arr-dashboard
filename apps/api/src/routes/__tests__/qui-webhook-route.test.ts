@@ -16,8 +16,8 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { quiEventBus } from "../../lib/qui/event-bus.js";
 import { generateQuiWebhookSecret } from "../../lib/qui/webhook-secret.js";
-import { registerQuiWebhookRoutes } from "../qui-webhook.js";
 import { buildQuiDeploymentId, buildQuiNotificationTargetOwnerId } from "../qui/webhook-routes.js";
+import { registerQuiWebhookRoutes } from "../qui-webhook.js";
 import { registerTestErrorHandler } from "./test-helpers.js";
 
 function createMockPrisma(userRow: unknown) {
@@ -33,6 +33,9 @@ function createMockPrisma(userRow: unknown) {
 				id: "evt-row-1",
 				receivedAt: new Date("2026-05-14T10:00:00Z"),
 			}),
+		},
+		systemSettings: {
+			findUnique: vi.fn().mockResolvedValue({ quiEnabled: true }),
 		},
 	};
 }
@@ -68,6 +71,20 @@ afterAll(async () => {
 });
 
 describe("POST /webhooks/qui", () => {
+	it("rejects webhook events while the Qui integration is disabled", async () => {
+		mockPrisma.systemSettings.findUnique.mockResolvedValue({ quiEnabled: false });
+
+		const res = await app.inject({
+			method: "POST",
+			url: `/webhooks/qui?secret=${secret.plaintextSecret}`,
+			payload: { type: "torrent_added", payload: {} },
+		});
+
+		expect(res.statusCode).toBe(404);
+		expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+		expect(mockPrisma.quiEventLog.create).not.toHaveBeenCalled();
+	});
+
 	it("returns 401 when no secret query param is supplied", async () => {
 		const res = await app.inject({
 			method: "POST",

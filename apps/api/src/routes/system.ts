@@ -28,6 +28,7 @@ const systemSettingsBodySchema = z.object({
 	externalUrl: z.string().nullable().optional(),
 	trustProxy: z.boolean().optional(),
 	secureCookies: z.boolean().nullable().optional(),
+	quiEnabled: z.boolean().optional(),
 });
 
 /**
@@ -93,6 +94,7 @@ const systemRoutes: FastifyPluginCallback = (app, _opts, done) => {
 				externalUrl: settings.externalUrl,
 				trustProxy: settings.trustProxy,
 				secureCookies: settings.secureCookies,
+				quiEnabled: settings.quiEnabled,
 				effectiveApiPort,
 				effectiveWebPort,
 				effectiveListenAddress,
@@ -110,8 +112,16 @@ const systemRoutes: FastifyPluginCallback = (app, _opts, done) => {
 	 * Note: Port and listen address changes require container restart to take effect
 	 */
 	app.put("/settings", async (request, reply) => {
-		const { apiPort, webPort, listenAddress, appName, externalUrl, trustProxy, secureCookies } =
-			validateRequest(systemSettingsBodySchema, request.body);
+		const {
+			apiPort,
+			webPort,
+			listenAddress,
+			appName,
+			externalUrl,
+			trustProxy,
+			secureCookies,
+			quiEnabled,
+		} = validateRequest(systemSettingsBodySchema, request.body);
 
 		// Validate port numbers if provided
 		if (apiPort !== undefined) {
@@ -244,6 +254,7 @@ const systemRoutes: FastifyPluginCallback = (app, _opts, done) => {
 				...(externalUrl !== undefined && { externalUrl: normalizedExternalUrl }),
 				...(trustProxy !== undefined && { trustProxy }),
 				...(secureCookies !== undefined && { secureCookies }),
+				...(quiEnabled !== undefined && { quiEnabled }),
 			},
 			create: {
 				id: 1,
@@ -254,6 +265,7 @@ const systemRoutes: FastifyPluginCallback = (app, _opts, done) => {
 				externalUrl: normalizedExternalUrl,
 				trustProxy: trustProxy ?? false,
 				secureCookies: secureCookies ?? null,
+				quiEnabled: quiEnabled ?? true,
 			},
 		});
 
@@ -299,6 +311,7 @@ const systemRoutes: FastifyPluginCallback = (app, _opts, done) => {
 				externalUrl: settings.externalUrl,
 				trustProxy: settings.trustProxy,
 				secureCookies: settings.secureCookies,
+				quiEnabled: settings.quiEnabled,
 				effectiveApiPort: currentApiPort,
 				effectiveWebPort: currentWebPort,
 				effectiveListenAddress: currentListenAddress,

@@ -23,6 +23,7 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { PremiumEmptyState, PremiumSection, ServiceBadge } from "../../../components/layout";
 import { Button, toast } from "../../../components/ui";
 import { useThemeGradient } from "../../../hooks/useThemeGradient";
@@ -412,6 +413,7 @@ const InstanceConfigCard = ({
 	animationDelay: number;
 }) => {
 	const [incognitoMode] = useIncognitoMode();
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	const { gradient: themeGradient } = useThemeGradient();
 	const serviceGradient = getServiceGradient(config.service);
 	const { updateConfig, deleteConfig, isUpdating, isDeleting } = useUpdateQueueCleanerConfig();
@@ -706,22 +708,23 @@ const InstanceConfigCard = ({
 					</div>
 				</RuleSection>
 
-				{/* Rule: qui-aware mode (Phase 2.3) */}
-				<RuleSection
-					icon={ShieldCheck}
-					title="qui-aware mode"
-					description="Skip strikes when qui has paused or errored the torrent"
-					enabled={formData.quiAwareMode ?? false}
-					onToggle={(v) => updateField("quiAwareMode", v)}
-				>
-					<div className="text-[11px] text-muted-foreground/70 p-2.5 rounded-lg bg-card/20 border border-border/15">
-						When a queue item’s torrent is in <span className="font-medium">paused</span> or{" "}
-						<span className="font-medium">error</span> state in qui, this gate suppresses the strike
-						and surfaces the item as skipped with a qui-aware reason. Useful when qui automations
-						are already acting on the torrent (e.g., rule-based pause after seed goal). No-op if you
-						haven’t added a qui instance.
-					</div>
-				</RuleSection>
+				{quiIntegrationEnabled && (
+					<RuleSection
+						icon={ShieldCheck}
+						title="qui-aware mode"
+						description="Skip strikes when qui has paused or errored the torrent"
+						enabled={formData.quiAwareMode ?? false}
+						onToggle={(v) => updateField("quiAwareMode", v)}
+					>
+						<div className="text-[11px] text-muted-foreground/70 p-2.5 rounded-lg bg-card/20 border border-border/15">
+							When a queue item’s torrent is in <span className="font-medium">paused</span> or{" "}
+							<span className="font-medium">error</span> state in qui, this gate suppresses the
+							strike and surfaces the item as skipped with a qui-aware reason. Useful when qui
+							automations are already acting on the torrent (e.g., rule-based pause after seed
+							goal). No-op if you haven’t added a qui instance.
+						</div>
+					</RuleSection>
+				)}
 
 				{/* Rule: Last-seed protection (Phase 2.4) */}
 				<RuleSection

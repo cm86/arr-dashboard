@@ -54,6 +54,7 @@ import {
 import { decodePlexPositiveEpisodeGenerationMetadata } from "../plex/plex-positive-episode-generation-metadata.js";
 import { createQuiClient } from "../qui/client-factory.js";
 import { listQuiInstances } from "../qui/instance-helpers.js";
+import { isQuiIntegrationEnabled } from "../qui/integration-enabled.js";
 import {
 	calculateDiskTotals,
 	type InstanceInfo,
@@ -1593,6 +1594,7 @@ export {
 // distinct problems elsewhere in the system. The rollup respects the
 // operator's attention budget.
 const collectQuiSignals: Collector = async (app, userId, log) => {
+	if (!(await isQuiIntegrationEnabled(app.prisma))) return [];
 	const instances = await listQuiInstances(app, userId);
 
 	if (instances.length === 0) return [];

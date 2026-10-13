@@ -118,6 +118,7 @@ export function SystemTab() {
 	const [externalUrl, setExternalUrl] = useState("");
 	const [trustProxy, setTrustProxy] = useState(false);
 	const [secureCookies, setSecureCookies] = useState<boolean | null>(null);
+	const [quiEnabled, setQuiEnabled] = useState(true);
 	const [hasChanges, setHasChanges] = useState(false);
 	const [isDockerInfoOpen, setIsDockerInfoOpen] = useState(false);
 
@@ -149,6 +150,7 @@ export function SystemTab() {
 			setExternalUrl(settings.data.externalUrl || "");
 			setTrustProxy(settings.data.trustProxy);
 			setSecureCookies(settings.data.secureCookies);
+			setQuiEnabled(settings.data.quiEnabled);
 		}
 	}, [settings?.data]);
 
@@ -159,6 +161,7 @@ export function SystemTab() {
 		newExternalUrl: string,
 		newTrustProxy?: boolean,
 		newSecureCookies?: boolean | null,
+		newQuiEnabled?: boolean,
 	) => {
 		const originalApiPort = settings?.data?.apiPort ?? 3001;
 		const originalWebPort = settings?.data?.webPort ?? 3000;
@@ -166,9 +169,11 @@ export function SystemTab() {
 		const originalExternalUrl = settings?.data?.externalUrl ?? "";
 		const originalTrustProxy = settings?.data?.trustProxy ?? false;
 		const originalSecureCookies = settings?.data?.secureCookies ?? null;
+		const originalQuiEnabled = settings?.data?.quiEnabled ?? true;
 
 		const tp = newTrustProxy ?? trustProxy;
 		const sc = newSecureCookies !== undefined ? newSecureCookies : secureCookies;
+		const qe = newQuiEnabled ?? quiEnabled;
 
 		setHasChanges(
 			newApiPort !== originalApiPort ||
@@ -176,7 +181,8 @@ export function SystemTab() {
 				newListenAddress !== originalListenAddress ||
 				newExternalUrl !== originalExternalUrl ||
 				tp !== originalTrustProxy ||
-				sc !== originalSecureCookies,
+				sc !== originalSecureCookies ||
+				qe !== originalQuiEnabled,
 		);
 	};
 
@@ -241,6 +247,7 @@ export function SystemTab() {
 				externalUrl: externalUrl || null,
 				trustProxy,
 				secureCookies,
+				quiEnabled,
 			},
 			{ onSuccess: () => setHasChanges(false) },
 		);
@@ -271,7 +278,14 @@ export function SystemTab() {
 		);
 	}
 
-	const requiresRestart = settings?.data?.requiresRestart || hasChanges;
+	const requiresRestart =
+		settings?.data?.requiresRestart ||
+		(settings?.data !== undefined &&
+			(apiPort !== settings.data.apiPort ||
+				webPort !== settings.data.webPort ||
+				listenAddress !== settings.data.listenAddress ||
+				trustProxy !== settings.data.trustProxy ||
+				secureCookies !== settings.data.secureCookies));
 
 	return (
 		<div className="space-y-6">
@@ -588,6 +602,41 @@ export function SystemTab() {
 					)}
 				</div>
 			)}
+
+			<PremiumSection
+				title="Qui Integration"
+				description="Control the Qui connection and related dashboard features"
+				icon={Network}
+			>
+				<div className="flex max-w-2xl items-start justify-between gap-6">
+					<div className="space-y-1">
+						<label htmlFor="quiEnabled" className="text-sm font-medium text-foreground">
+							Enable Qui integration
+						</label>
+						<p className="max-w-md text-xs text-muted-foreground">
+							When disabled, the dashboard stops contacting Qui and hides Qui pages, navigation, and
+							related UI. Your Qui service configuration and stored data are kept so you can
+							re-enable the integration later.
+						</p>
+					</div>
+					<Switch
+						id="quiEnabled"
+						checked={quiEnabled}
+						onCheckedChange={(checked) => {
+							setQuiEnabled(checked);
+							checkForChanges(
+								apiPort,
+								webPort,
+								listenAddress,
+								externalUrl,
+								undefined,
+								undefined,
+								checked,
+							);
+						}}
+					/>
+				</div>
+			</PremiumSection>
 
 			{/* Port Configuration Section */}
 			<PremiumSection

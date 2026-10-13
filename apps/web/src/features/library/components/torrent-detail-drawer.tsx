@@ -11,6 +11,7 @@ import {
 } from "../../../components/ui/sheet";
 import { useIncognitoMode } from "../../../contexts/IncognitoContext";
 import { useQuiCapabilities } from "../../../hooks/api/useQui";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import type { SeriesTorrentCopy } from "../../../lib/api-client/qui";
 import { getLinuxSavePath } from "../../../lib/incognito";
 import { ActionsSection } from "./torrent-drawer/actions-section";
@@ -51,11 +52,12 @@ export const TorrentDetailDrawer: React.FC<TorrentDetailDrawerProps> = ({
 	arrContext,
 	onClose,
 }) => {
-	const open = copy !== null;
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
+	const open = quiIntegrationEnabled && copy !== null;
 	return (
 		<Sheet open={open} onOpenChange={(o) => !o && onClose()}>
 			<SheetContent side="right" className="w-[480px] sm:max-w-[480px] overflow-y-auto">
-				{copy && <DrawerBody copy={copy} arrContext={arrContext ?? null} />}
+				{open && copy && <DrawerBody copy={copy} arrContext={arrContext ?? null} />}
 			</SheetContent>
 		</Sheet>
 	);

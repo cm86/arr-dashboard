@@ -12,6 +12,7 @@ export interface SystemSettings {
 	externalUrl: string | null;
 	trustProxy: boolean;
 	secureCookies: boolean | null;
+	quiEnabled: boolean;
 	effectiveApiPort: number;
 	effectiveWebPort: number;
 	effectiveListenAddress: string;
@@ -73,6 +74,7 @@ export interface UpdateSystemSettingsPayload {
 	externalUrl?: string | null;
 	trustProxy?: boolean;
 	secureCookies?: boolean | null;
+	quiEnabled?: boolean;
 }
 
 // ============================================================================

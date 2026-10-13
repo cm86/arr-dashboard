@@ -12,6 +12,7 @@ import {
 } from "../lib/library-cleanup/cleanup-executor.js";
 import { clearFileIdIndexCache } from "../lib/library-sync/infohash-backfill-by-inode.js";
 import type { ServiceInstance, ServiceType } from "../lib/prisma.js";
+import { isQuiIntegrationEnabled } from "../lib/qui/integration-enabled.js";
 import { withQuiObservationTopologyGuard } from "../lib/qui/observation-topology-guard.js";
 import { invalidateTorrentListCache } from "../lib/qui/torrent-list-cache.js";
 import { testServiceConnection } from "../lib/services/connection-tester.js";
@@ -1244,6 +1245,9 @@ const servicesRoute: FastifyPluginCallback = (app, _opts, done) => {
 				error: "Invalid service type",
 				details: `Service must be one of: ${ALL_SERVICES.join(", ")}`,
 			});
+		}
+		if (service === "qui" && !(await isQuiIntegrationEnabled(app.prisma))) {
+			return reply.status(404).send({ error: "Qui integration is disabled" });
 		}
 		const httpAuthConflict = httpAuth ? getHttpAuthConflict(service) : null;
 		if (httpAuthConflict) {

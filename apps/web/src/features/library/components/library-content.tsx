@@ -12,6 +12,7 @@ import { useMemo } from "react";
 import { PremiumEmptyState, PremiumSkeleton } from "../../../components/layout";
 import { Pagination } from "../../../components/ui";
 import { useLibrarySeedingSummary, useTrackerIcons } from "../../../hooks/api/useQui";
+import { useQuiIntegrationEnabled } from "../../../contexts/QuiIntegrationContext";
 import { buildJellyfinUrl, buildPlexUrl } from "../lib/library-utils";
 
 /**
@@ -182,6 +183,7 @@ export const LibraryContent: React.FC<LibraryContentProps> = ({
 	plexMachineIdMap,
 	jellyfinServerMap,
 }) => {
+	const quiIntegrationEnabled = useQuiIntegrationEnabled();
 	/** Lookup enrichment for a library item by its tmdbId + type */
 	const getEnrichment = (item: LibraryItem) => {
 		if (!enrichmentMap || !item.remoteIds?.tmdbId) return undefined;
@@ -250,6 +252,7 @@ export const LibraryContent: React.FC<LibraryContentProps> = ({
 	 * already-loaded item.
 	 */
 	const getQuiState = (item: LibraryItem) => {
+		if (!quiIntegrationEnabled) return null;
 		if (!item.torrentState || item.torrentRatio == null) return null;
 		return { state: item.torrentState, ratio: item.torrentRatio };
 	};
@@ -279,8 +282,11 @@ export const LibraryContent: React.FC<LibraryContentProps> = ({
 				})),
 		[allItems],
 	);
-	const seedingSummaryQuery = useLibrarySeedingSummary({ items: seedingSummaryItems });
-	const trackerIconsQuery = useTrackerIcons();
+	const seedingSummaryQuery = useLibrarySeedingSummary({
+		items: seedingSummaryItems,
+		enabled: quiIntegrationEnabled,
+	});
+	const trackerIconsQuery = useTrackerIcons({ enabled: quiIntegrationEnabled });
 	const summaries = seedingSummaryQuery.data?.summaries ?? {};
 	const trackerIcons = trackerIconsQuery.data?.trackers;
 	// Lookup helper that matches the backend's `arrInstanceId|type:id` key
@@ -289,6 +295,7 @@ export const LibraryContent: React.FC<LibraryContentProps> = ({
 	const getSeedingSummary = (
 		item: LibraryItem,
 	): { trackerCount: number; topHosts: string[] } | null => {
+		if (!quiIntegrationEnabled) return null;
 		if (!item.instanceId || typeof item.id !== "number") return null;
 		const key = `${item.instanceId}|${item.type}:${item.id}`;
 		const s = summaries[key];

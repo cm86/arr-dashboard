@@ -15,6 +15,7 @@ export interface QuiRequestContext {
 	apiKey: string;
 	httpAuthHeaders?: Record<string, string>;
 	log: FastifyBaseLogger;
+	isIntegrationEnabled?: () => Promise<boolean>;
 	timeoutMs?: number;
 }
 
@@ -53,6 +54,9 @@ export async function quiRequest<T>(
 		timeoutMs?: number;
 	},
 ): Promise<T> {
+	if (ctx.isIntegrationEnabled && !(await ctx.isIntegrationEnabled())) {
+		throw new QuiIntegrationDisabledError();
+	}
 	const url = buildUrl(ctx.baseUrl, path, init?.query);
 	const timeoutMs = init?.timeoutMs ?? ctx.timeoutMs ?? DEFAULT_QUI_TIMEOUT_MS;
 
@@ -121,6 +125,9 @@ export async function quiRequest<T>(
 export async function quiHealthProbe(
 	ctx: QuiRequestContext,
 ): Promise<{ ok: true; status: number } | { ok: false; reason: string }> {
+	if (ctx.isIntegrationEnabled && !(await ctx.isIntegrationEnabled())) {
+		return { ok: false, reason: "Qui integration is disabled" };
+	}
 	const url = buildUrl(ctx.baseUrl, "/health");
 	const timeoutMs = ctx.timeoutMs ?? DEFAULT_QUI_TIMEOUT_MS;
 
@@ -140,6 +147,15 @@ export async function quiHealthProbe(
 		return { ok: true, status: response.status };
 	} catch (error) {
 		return { ok: false, reason: describeNetworkError(error) };
+	}
+}
+
+export class QuiIntegrationDisabledError extends Error {
+	readonly statusCode = 503;
+
+	constructor() {
+		super("Qui integration is disabled");
+		this.name = "QuiIntegrationDisabledError";
 	}
 }
 
